@@ -20,11 +20,24 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
+
+	"github.com/BurntSushi/toml"
 )
 
 // ============================
 // Types
 // ============================
+const (
+	errAuthorNameRequired  = Error("author name required in config.toml")
+	errAuthorEmailRequired = Error("author email required in config.toml")
+)
+
+// Error allows us to create constant type errors which are
+// safer to use. See: https://dave.cheney.net/2016/04/07/constant-errors
+type Error string
+
+func (e Error) Error() string { return string(e) }
 
 // BeaconLog represents the entire blob of json from the beacon file
 type BeaconLog struct {
@@ -55,7 +68,7 @@ var beaconLogData BeaconLog
 
 func checkError(e error) {
 	if e != nil {
-		panic(e)
+		log.Fatal(e)
 	}
 }
 
@@ -71,10 +84,30 @@ func printLog(data BeaconLog) {
 	}
 }
 
+func hasValidConfig(config beaconConfig) error {
+	if len(config.Author.Name) < 1 {
+		return errAuthorNameRequired
+	}
+
+	if len(config.Author.Email) < 1 {
+		return errAuthorEmailRequired
+	}
+
+	return nil
+}
+
 // ============================
 // MAIN!
 // ============================
 func main() {
+	var config beaconConfig
+	if _, err := toml.DecodeFile("./config.toml", &config); err != nil {
+		log.Fatalf("error decoding config.toml %v\r\n", err)
+	}
+
+	if err := hasValidConfig(config); err != nil {
+		log.Fatal(err)
+	}
 
 	// read JSON file from disk
 	beaconLogFile, err := ioutil.ReadFile("./beacon_log.json")
@@ -84,9 +117,18 @@ func main() {
 	// unmarshal json and store it in the pointer to beaconLogData {?}
 	// NOTE: figure out if you can use `checkError` here; don't yet understand golang's idiomatic errors handling.
 	if err := json.Unmarshal(beaconLogFile, &beaconLogData); err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	// Print the beacon log!
 	printLog(beaconLogData)
+}
+
+type beaconConfig struct {
+	Author author
+}
+
+type author struct {
+	Name  string
+	Email string
 }
