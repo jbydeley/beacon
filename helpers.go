@@ -1,6 +1,4 @@
-// Package helpers provides general functions that don't
-// exactly belond to a single other package.
-package helpers
+package beacon
 
 import (
 	"bufio"

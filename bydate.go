@@ -1,4 +1,4 @@
-package messages
+package beacon
 
 // ByDate implements sort.Interface for []Log based
 // on the Date field

@@ -1,11 +1,11 @@
-package config
+package beacon
 
 import (
 	"path"
 	"testing"
 )
 
-func Test_Load(t *testing.T) {
+func Test_LoadConfigFile(t *testing.T) {
 	tt := []struct {
 		Path string
 		Err  error
@@ -27,25 +27,25 @@ func Test_Load(t *testing.T) {
 
 	for _, tc := range tt {
 		path := path.Join("testdata", tc.Path)
-		_, err := Load(path)
+		_, err := LoadConfigFile(path)
 		if err != tc.Err {
-			t.Fatalf("Load(%v) returned an error (%v)", path, err)
+			t.Fatalf("LoadConfigFile(%v) returned an error (%v)", path, err)
 		}
 	}
 }
 
-func Test_Load_MissingFile(t *testing.T) {
+func Test_LoadConfigFile_MissingFile(t *testing.T) {
 	path := path.Join("testdata", "no_exist.json")
-	_, err := Load(path)
+	_, err := LoadConfigFile(path)
 	if err == nil {
-		t.Fatalf("Load(%v) should have returned an error but did not", path)
+		t.Fatalf("LoadConfigFile(%v) should have returned an error but did not", path)
 	}
 }
 
-func Test_Load_EmptyPath(t *testing.T) {
-	_, err := Load("")
+func Test_LoadConfigFile_EmptyPath(t *testing.T) {
+	_, err := LoadConfigFile("")
 	if err != ErrInvalidPath {
-		t.Fatalf("Load(%v) should have return returned (%v)", "", ErrInvalidPath)
+		t.Fatalf("LoadConfigFile(%v) should have return returned (%v)", "", ErrInvalidPath)
 	}
 }
 

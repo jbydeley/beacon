@@ -1,4 +1,4 @@
-package messages
+package beacon
 
 import "testing"
 
